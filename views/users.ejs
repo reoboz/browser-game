@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ダンマス / DnM 「Dungeon and Masters」</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <audio src="vivid.mp3" id="vividsound" preload="auto"></audio>
+  </head>
+
+<body>
+      
+      <!-- モーダル・ダイアログ -->
+      <div class="modal fade" id="sampleModal" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h4 class="modal-title">BATTLE RESULT</h4>
+            </div>
+            <div class="modal-body">
+              <p id="modallog"></p>
+              <div class="p1"></div>
+              <div class="p2"></div>
+              <div class="p3"></div>
+              <p></p>
+              <p id="modalreward"></p>
+            </div>
+            <div class="modal-footer">
+              <!-------<button type="button" class="btn btn-default" data-dismiss="modal">キャンセル</button>-->
+              <button type="button" class="btn btn-primary" onclick="location.href='helo'">マップに戻る</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+<div class='battlescreen'>
+<div id="p1"></div>
+<div id="p2"></div>
+<div id="p3"></div>
+<div id="m1"></div>
+<div id="m2"></div>
+<div id="m3"></div>
+</div>
+<script src="/jquery/jquery.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+	
+<script type="text/javascript">
+//let bgm = document.getElementById("vividsound").play();
+
+let data = JSON.parse('<%-data%>')
+let player1 = JSON.parse('<%-player1%>')
+let player2 = JSON.parse('<%-player2%>')
+let player3 = JSON.parse('<%-player3%>')
+let monster1 = JSON.parse('<%-monster1%>')
+let monster2 = JSON.parse('<%-monster2%>')
+let monster3 = JSON.parse('<%-monster3%>')
+
+let cnt=0;
+let len=data.length;
+let counterslain = [0,0,0];
+let ready = 1
+if (monster1.droptype == 'none'){$('.battlescreen').css("background","top/cover url(https://cdn.discordapp.com/attachments/402211254627991552/558456754527272961/pipo-battlebg009.jpg)")
+}else if(monster1.droptype == 'Aliceland'){
+  $('.battlescreen').css("background","center/cover url(https://cdn.discordapp.com/attachments/402211254627991552/560195750366281748/30ebc206.png)")
+}else if(monster1.droptype == 'Brumel'){
+  $('.battlescreen').css("background","top/cover url(https://cdn.discordapp.com/attachments/402211254627991552/558582803504168961/pipo-battlebg002.jpg)")
+}else if(monster1.droptype == 'Canyon'){
+  $('.battlescreen').css("background","top/cover url(https://cdn.discordapp.com/attachments/402211254627991552/558582836643233802/pipo-battlebg004.jpg)")
+}else if(monster1.droptype == 'Darberg'){
+  $('.battlescreen').css("background","top/cover url(https://cdn.discordapp.com/attachments/402211254627991552/558582814224809994/pipo-battlebg003.jpg)")
+}
+$('#p1').append("<img class='unit p1' src="+player1.img+">")
+$('#p2').append("<img class='unit p2' src="+player2.img+">")
+$('#p3').append("<img class='unit p3' src="+player3.img+">")
+if(monster1.mhp > 0){$('#m1').append("<img class='unit m1' src="+monster1.img+">")}
+if(monster2.mhp > 0){$('#m2').append("<img class='unit m2' src="+monster2.img+">")}
+if(monster3.mhp > 0){$('#m3').append("<img class='unit m3' src="+monster3.img+">")}
+
+$('#p1').append('<progress class="unit lifeBar" value="'+player1.mhp+'" max="'+player1.mhp+'" min="0" optimum="100"></progress>')
+$('#p2').append('<progress class="unit lifeBar" value="'+player2.mhp+'" max="'+player2.mhp+'" min="0" optimum="100"></progress>')
+$('#p3').append('<progress class="unit lifeBar" value="'+player3.mhp+'" max="'+player3.mhp+'" min="0" optimum="100"></progress>')
+if(monster1.mhp > 0){$('#m1').append('<progress class="unit lifeBar" value="'+monster1.mhp+'" max="'+monster1.mhp+'" min="0" optimum="100"></progress>')}
+if(monster2.mhp > 0){$('#m2').append('<progress class="unit lifeBar" value="'+monster2.mhp+'" max="'+monster2.mhp+'" min="0" optimum="100"></progress>')}
+if(monster3.mhp > 0){$('#m3').append('<progress class="unit lifeBar" value="'+monster3.mhp+'" max="'+monster3.mhp+'" min="0" optimum="100"></progress>')}
+$('.p1').append("<img class='result p1' src="+player1.img+">")
+$('.p2').append("<img class='result p2' src="+player2.img+">")
+$('.p3').append("<img class='result p3' src="+player3.img+">")
+$('#modallog').append('<b>'+data[len-4]+'</b>')
+$('.p1').append('<b>'+data[len-3]+'</b>')
+$('.p2').append('<b>'+data[len-2]+'</b>')
+$('.p3').append('<b>'+data[len-1]+'</b>')
+console.log(data)
+
+function preattack(num){
+  ready = 0
+  if(num <= 3){
+    $('#p'+num).animate({
+      left: "-=30px"
+    },100).animate({
+      left: "+=30px"
+    },100,function(){
+      ready = 1
+    })
+  }else{
+    num -= 3;
+    if(num <= 3){
+      $('#m'+num).animate({
+        left: "+=30px"
+      },100).animate({
+        left: "-=30px"
+      },100,function(){
+        ready = 1
+      })
+    }
+  }
+}
+function attack(num,dmg){
+  ready = 0
+  if(num <= 3){
+    $('#p'+num).fadeOut(65, function(){$(this).fadeIn(65,function(){
+      $('#p'+num+'>.lifeBar')[0].value -= dmg;
+      $('#p'+num).append("<span style='color:white; font-size:28px; position:absolute; left:"+Math.round(18+(Math.random()*30))+"px; top:"+Math.round(35+(Math.random()*20))+"px;'>"+dmg+"</span>")
+      $('#p'+num+'>span').animate({
+        top: "-=50px",
+      },{
+        duration:700,
+        easing:"linear",
+        queue:false,
+      }).delay(300).fadeOut(400)
+      $(this).fadeOut(65,function(){$(this).fadeIn(65,function(){
+        ready = 1
+      })})
+    })});
+  }else{
+    num -= 3;
+    $('#m'+num).fadeOut(65, function(){$(this).fadeIn(65,function(){
+      $('#m'+num+'>.lifeBar')[0].value -= dmg;
+      $('#m'+num).append("<span style='color:white; font-size:28px; position:absolute; left:"+Math.round(18+(Math.random()*30))+"px; top:"+Math.round(35+(Math.random()*20))+"px;'>"+dmg+"</span>")
+      $('#m'+num+'>span').animate({
+        top: "-=50px",
+      },{
+        duration:700,
+        easing:"linear",
+        queue:false,
+      }).delay(300).fadeOut(400)
+      $(this).fadeOut(65,function(){$(this).fadeIn(65,function(){
+        ready = 1
+      })})
+    })});
+  }
+}
+function heal(num,healdmg){
+  ready = 0
+  if(num <= 3){
+    $('#p'+num).fadeOut(150, function(){$(this).fadeIn(65,function(){
+      $('#p'+num+'>.lifeBar')[0].value += healdmg;
+      $('#p'+num).append("<span style='color:lightgreen; font-size:28px; position:absolute; left:"+33+"px; top:"+45+"px;'>"+healdmg+"</span>")
+      $('#p'+num+'>span').animate({
+        top: "-=20px",
+      },{
+        duration:150,
+        easing:"swing",
+        queue:false,
+      }).delay(500).fadeOut(500)
+      $(this).fadeOut(65,function(){$(this).fadeIn(65,function(){
+        ready = 1
+      })})
+    })});
+  }else{
+    num -= 3;
+    $('#m'+num).fadeOut(250, function(){$(this).fadeIn(35,function(){
+      $('#m'+num+'>.lifeBar')[0].value += healdmg;
+      $('#m'+num).append("<span style='color:lightgreen; font-size:28px; position:absolute; left:"+33+"px; top:"+45+"px;'>"+healdmg+"</span>")
+      $('#m'+num+'>span').animate({
+        top: "-=20px",
+      },{
+        duration:150,
+        easing:"swing",
+        queue:false,
+      }).delay(500).fadeOut(500)
+      $(this).fadeOut(35,function(){$(this).fadeIn(35,function(){
+        ready = 1
+      })})
+    })});
+  }
+}
+function slain(num){
+  ready = 0
+  if(num <= 3){
+    $('#p'+num).fadeOut(50, function(){$(this).fadeIn(50,function(){
+      $(this).fadeOut(50,function(){$(this).fadeIn(50,function(){
+        $(this).fadeOut(50,function(){$(this).fadeIn(50,function(){
+          $(this).fadeOut(50,function(){$(this).fadeIn(50,function(){
+            $(this).fadeOut(180,function(){
+              $(this).css({"display": "inline","visibility": "hidden"});
+              ready = 1
+            }
+          )})})
+        })})
+      })})
+    })});
+  }else{
+    num -= 3;
+    counterslain[num-1] = 1
+    $('#m'+num).fadeOut(50, function(){$(this).fadeIn(50,function(){
+      $(this).fadeOut(50,function(){$(this).fadeIn(50,function(){
+        $(this).fadeOut(50,function(){$(this).fadeIn(50,function(){
+          $(this).fadeOut(50,function(){$(this).fadeIn(50,function(){
+            $(this).fadeOut(180,function(){
+              if(counterslain[num-1] == 1){$(this).css({"display": "inline","visibility": "hidden"})
+              ready = 1
+            }else{
+              $(this).fadeIn(0)
+              if(num==1){$('#m1>.lifeBar')[0].value = monster1.mhp}
+              if(num==2){$('#m2>.lifeBar')[0].value = monster2.mhp}
+              if(num==3){$('#m3>.lifeBar')[0].value = monster3.mhp}
+            };
+            })
+          })})
+        })})
+      })})
+    })});
+  }
+}
+function stun(num){
+  if(num <= 3){
+    $('#p'+num).css('opacity','0.5')
+  }else{
+    num -= 3;
+    $('#m'+num).css('opacity','0.5')
+  }
+}
+function dodge(num){
+  if(num <= 3){
+    $('#p'+num).delay(150).animate({
+      left: "+=30px"
+    },100).animate({
+      left: "-=30px"
+    },100)
+  }else{
+    num -= 3;
+    if(num <= 3){
+      $('#m'+num).delay(150).animate({
+        left: "-=30px"
+      },100).animate({
+        left: "+=30px"
+      },100)
+    }
+  }
+}
+
+let push = 1
+$(document).keydown(() =>{
+  if (push == 0){push = 1
+}else if(push == 1){
+  push = 0
+  auto()
+}
+})
+
+function auto(){
+  if (push == 0){
+    setTimeout(auto,10)
+    test()
+  }else if(push == 1){
+    clearInterval()
+  }
+}
+function test(){
+  if(ready != 1){
+    return false;
+}else{
+  if (len>cnt){
+    if (data[cnt].indexOf("Turn") !== -1 || data[cnt].indexOf("現在") !== -1 || data[cnt].indexOf("攻略") !== -1 ){
+      //stunリセット
+      $('#p1').css('opacity','1')
+      $('#p2').css('opacity','1')
+      $('#p3').css('opacity','1')
+      $('#m1').css('opacity','1')
+      $('#m2').css('opacity','1')
+      $('#m3').css('opacity','1')
+      $('.battlescreen').append("<p id=sysmsg>"+data[cnt]+"</p>")
+      setTimeout(function(){
+        $('#sysmsg').remove();
+      },3000);
+      if(data[cnt].indexOf("現在") !== -1){
+        counterslain = [0,0,0];
+        if(monster1.mhp > 0){$('#m1').css({"display": "inline-block", "visibility":"visible"});$('#m1>.lifeBar')[0].value = monster1.mhp;}
+        if(monster2.mhp > 0){$('#m2').css({"display": "inline-block", "visibility":"visible"});$('#m2>.lifeBar')[0].value = monster2.mhp;}
+        if(monster3.mhp > 0){$('#m3').css({"display": "inline-block", "visibility":"visible"});$('#m3>.lifeBar')[0].value = monster3.mhp;}
+        ready = 0
+        $('#p1').delay(100).animate({
+          left: "800px"
+        },0).animate({
+          left:"-=350px"
+        },500)
+        $('#p2').delay(100).animate({
+          left: "800px"
+        },0).animate({
+          left:"-=350px"
+        },500)
+        $('#p3').delay(100).animate({
+          left: "800px"
+        },0).animate({
+          left:"-=350px"
+        },500,function(){
+          ready = 1
+        })
+      }
+    }else if(data[cnt].indexOf("戦闘に勝利") !== -1){
+      if(data[cnt+1].indexOf("･･･おや？") !== -1){
+        $('#modalreward').append('<p><b>'+data[cnt+1]+'</b></p>')
+        $('#modalreward').append('<p><b>'+data[cnt+2]+'</b></p>')
+      }
+      if(data[cnt].indexOf("ダンジョンクリア") !== -1){
+        cnt+=5;
+      }else{
+        ready = 0
+        $('#p1').animate({
+          left: "-=750px"
+        },1000)
+        $('#p2').animate({
+          left: "-=750px"
+        },1000)
+        $('#p3').animate({
+          left: "-=750px"
+        },1000,function(){
+          ready = 1
+        })
+      }
+    }else if(data[cnt].indexOf("たおれた") !== -1){
+      if (data[cnt].indexOf(player1.heroname) !== -1){slain(1);}
+      if (data[cnt].indexOf(player2.heroname) !== -1){slain(2);}
+      if (data[cnt].indexOf(player3.heroname) !== -1){slain(3);}
+      if (data[cnt].indexOf(monster1.heroname) !== -1){slain(4);}
+      if (data[cnt].indexOf(monster2.heroname) !== -1){slain(5);}
+      if (data[cnt].indexOf(monster3.heroname) !== -1){slain(6);}
+    }else if(data[cnt].indexOf("こうげき！") !== -1){
+      if (data[cnt].indexOf(player1.heroname) !== -1){preattack(1);}
+      if (data[cnt].indexOf(player2.heroname) !== -1){preattack(2);}
+      if (data[cnt].indexOf(player3.heroname) !== -1){preattack(3);}
+      if (data[cnt].indexOf(monster1.heroname) !== -1){preattack(4);}
+      if (data[cnt].indexOf(monster2.heroname) !== -1){preattack(5);}
+      if (data[cnt].indexOf(monster3.heroname) !== -1){preattack(6);}
+      if(data[cnt+1].indexOf("かわした！") !== -1){
+        cnt++
+        if (data[cnt].indexOf(player1.heroname) !== -1){dodge(1);}
+        if (data[cnt].indexOf(player2.heroname) !== -1){dodge(2);}
+        if (data[cnt].indexOf(player3.heroname) !== -1){dodge(3);}
+        if (data[cnt].indexOf(monster1.heroname) !== -1){dodge(4);}
+        if (data[cnt].indexOf(monster2.heroname) !== -1){dodge(5);}
+        if (data[cnt].indexOf(monster3.heroname) !== -1){dodge(6);}
+      }
+    }else if(data[cnt].indexOf("ダメージ") !== -1){
+      if(parseInt(data[cnt].replace(/[^0-9^\.]/g,""),10) > 0){
+        let dmg = data[cnt].replace(/[^0-9^\.]/g,"");
+        if (data[cnt].indexOf(player1.heroname) !== -1){attack(1,dmg);}
+        if (data[cnt].indexOf(player2.heroname) !== -1){attack(2,dmg);}
+        if (data[cnt].indexOf(player3.heroname) !== -1){attack(3,dmg);}
+        if (data[cnt].indexOf(monster1.heroname) !== -1){attack(4,dmg);}
+        if (data[cnt].indexOf(monster2.heroname) !== -1){attack(5,dmg);}
+        if (data[cnt].indexOf(monster3.heroname) !== -1){attack(6,dmg);}
+      }
+    }else if(data[cnt].indexOf("回復") !== -1){
+      if(parseInt(data[cnt].replace(/[^0-9^\.]/g,""),10) > 0){
+        let healdmg = Number(data[cnt].replace(/[^0-9^\.]/g,""));
+        if (data[cnt].indexOf(player1.heroname) !== -1){heal(1,healdmg);}
+        if (data[cnt].indexOf(player2.heroname) !== -1){heal(2,healdmg);}
+        if (data[cnt].indexOf(player3.heroname) !== -1){heal(3,healdmg);}
+        if (data[cnt].indexOf(monster1.heroname) !== -1){heal(4,healdmg);}
+        if (data[cnt].indexOf(monster2.heroname) !== -1){heal(5,healdmg);}
+        if (data[cnt].indexOf(monster3.heroname) !== -1){heal(6,healdmg);}
+      }
+    }else if(data[cnt].indexOf("きぜつ") !== -1){
+      if (data[cnt].indexOf(player1.heroname) !== -1){stun(1);}
+      if (data[cnt].indexOf(player2.heroname) !== -1){stun(2);}
+      if (data[cnt].indexOf(player3.heroname) !== -1){stun(3);}
+      if (data[cnt].indexOf(monster1.heroname) !== -1){stun(4);}
+      if (data[cnt].indexOf(monster2.heroname) !== -1){stun(5);}
+      if (data[cnt].indexOf(monster3.heroname) !== -1){stun(6);}
+    }
+    if(data[cnt].indexOf("ダンジョンクリア") !== -1){
+      cnt += 4;
+    }
+    cnt++
+    }else{
+      $('#sampleModal').modal({backdrop:"static",})
+    }
+  }
+}
+
+
+
+</script>
+</div>
+</body>
+</html>
+
+

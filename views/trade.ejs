@@ -1,0 +1,312 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>ダンマス / DnM 「Dungeon and Masters」</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+
+<body>
+  <!--モーダルダイアログ-->
+  <div class="modal" id="info" tabindex="-1">
+  <div class="modal-dialog infodialog" style="z-index: 1500">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"></h4>
+      </div>
+      <div class="modal-body" id ="modaldetail">
+      <table class="modaltable" style="display:inline-block;">
+      </table>
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand active" href="../">Dungeon and Masters</a>
+      <ul class="navbar-items"></ul>
+    </div>
+    <ul class="nav navbar-nav le-navbar-table">
+      <li><a href="../">ホーム</a></li>
+      <li><a href="helo">マップ</a></li>
+      <li><a href="assets">アセット</a></li>
+      <li class="active"><a href="trade">トレード</a></li>
+    </ul>
+  </div>
+</nav>
+
+<button class="btn" style="width:100px;" onclick="displayPage(shop); getData('shop');">ショップ</button>
+<button class="btn" style="width:100px;" onclick="displayPage(trade);getData('trade');">取引所</button>
+<button class="btn" style="width:100px;" onclick="displayPage(list);">出品</button>
+<button class="btn" style="width:100px;" onclick="displayPage(mtx);">MTX</button>
+<div id="shop" class="assets">
+<h1>ショップ</h1>
+<button class="btn" style="width:100px;" onclick="getData('shop')">ユニット</button><p></p>
+<div class="section"></div>
+</div>
+<div id="trade" class="assets">
+ <h1>取引所</h1>  
+ <button class="btn" style="width:100px;" onclick="getData('trade/hero')">ユニット</button>
+ <button class="btn" style="width:100px;" onclick="getData('trade/gear')">装備</button><p></p>
+ <div class="section"></div>
+</div>
+
+<div id="list" class="assets">
+ <h1>取引所にアイテムを出品する</h1>
+ <h1>所持アセット</h1>
+ 
+ <div class="section">
+ </div>
+</div>
+
+<div id="mtx" class="assets">
+ <h1>課金</h1>
+ <h3>なんもねーよ？？</h3>
+</div>
+
+<script type="text/javascript">
+
+let usercoin = JSON.parse( '<%-usercoin%>' );
+let stamina = JSON.parse( '<%-stamina%>' );
+let herodata = JSON.parse( '<%-herodata%>' );
+let geardata = JSON.parse( '<%-geardata%>' );
+let shopdata = {}
+let userhero = JSON.parse( '<%-userhero%>' );
+let usergear = JSON.parse( '<%-usergear%>' );
+let lastdisplay = "#shop"
+
+function getData(hash){
+  if (hash === 'shop'){
+    $.get('trade/shop')
+    .done(function(data){
+      shopdata = data;
+      $("#shop .section").empty();
+      for (let i=0;i<data.length;i++){
+        for (let n=0;n<herodata.length;n++){
+          if(herodata[n].heroname === data[i].heroname){$('#shop .section').append("<div class='shopslot' style='display:inline-block; position:relative;' onclick='shopherodetail("+n+","+i+");'><img src='"+herodata[n].img+"'class='herolist'><span class='heroname'>Lv.1<br>"+shopdata[i].heroname+"</span><p class='price' style='border-top:1px solid;'>"+shopdata[i].price+"</p></div>");break;}
+        }
+      }
+    })
+  }else if (hash === 'trade/hero'){
+    $.get('trade/trade/hero')
+    .done(function(data){
+      tradedata = data;
+      $("#trade .section").empty();
+      for (let i=0;i<data.length;i++){
+        for (let n=0;n<herodata.length;n++){
+          if(herodata[n].heroname === data[i].heroname){$('#trade .section').append("<div class='shopslot' style='display:inline-block; position:relative;' onclick='tradeherodetail("+n+","+i+");'><img src='"+herodata[n].img+"'class='herolist'><span class='heroname'>Lv."+tradedata[i].lv+"<br>"+tradedata[i].heroname+"</span><p class='price' style='border-top:1px solid;'>"+tradedata[i].price+"</p></div>");break;}
+        }
+      }
+    })
+  }else if (hash === 'trade/gear'){
+    $.get('trade/trade/gear')
+    .done(function(data){
+      tradedata = data;
+      $("#trade .section").empty();
+      for (let i=0;i<data.length;i++){
+        for (let n=0;n<geardata.length;n++){
+          if(geardata[n].gearname === data[i].gearname){$('#trade .section').append("<div class='shopslot' style='display:inline-block; position:relative;' onclick='tradegeardetail("+n+","+i+");'><img src='"+geardata[n].img+"'class='gearlist'><span class='heroname'>Lv."+tradedata[i].lv+"<br>"+tradedata[i].gearname+"</span><p class='price' style='border-top:1px solid;'>"+tradedata[i].price+"</p></div>");break;}
+        }
+      }
+    })
+  }
+}
+
+function displayPage(hash){
+  $(lastdisplay).css("display", "none");
+  $(hash).css("display", "block");
+  lastdisplay = hash;
+}
+
+function purchase(id){
+  if (usercoin[0].alice - shopdata[id].price >=0 && shopdata[id].stock > 0){
+    $.get('trade/purchase',{'productid':id})
+    .done(function(data){
+      alert(data)
+      location.href="trade"
+    })
+  }else{alert("購入に失敗しました。")}
+}
+
+function tradepurchase(id,type){
+  if (usercoin[0].alice - tradedata[id].price >=0){
+    $.get('trade/trade/purchase',{'productid':id, 'type':type})
+    .done(function(data){
+      alert(data)
+      location.href="trade"
+    })
+  }else{alert("購入に失敗しました。")}
+}
+
+function submit(id,type){
+  let price = $('.modal-footer input').val()
+  if (price >= 1){
+    if (type === 1){
+      var item = userhero[id].heroname
+      var itemid = userhero[id].heroid
+    }else if (type === 2){
+      var item = usergear[id].gearname
+      var itemid = usergear[id].gearid
+    }else{alert("Error [400 - コーディングエラー]");return;}
+    $.get('trade/submit',{'type':type, 'item':item,'itemid':itemid,'price':price})
+    .done(function(data){
+      alert(data)
+      location.href="trade"
+    })
+  }else{alert("値段を設定してください")}
+}
+
+function shopherodetail(name,id){
+  let shoplv = 1
+  let atk = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285181745266718/iGuuD3Rajbc6oNowJaYZci3DENH6MYu8kayd3LaIWkMzEuz6akESTSRM0AAAAASUVORK5CYII.png'></th><th>"+Math.round(herodata[name].atk*(1+shoplv*0.05))+"</th>"
+  let mag = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285236870742038/cXRynhVrd8EF6BNZGAt7cDNwhpkCYDGSygN0nNuG0CLgAVkDNIB769acsACsKqUbsEhDeRTAGvzvhbBzIFjANJybb8s9YGolvyPV.png'></th><th>"+Math.round(herodata[name].mag*(1+shoplv*0.05))+"</th>"
+  let spd = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285386171318282/DNRwAAAABJRU5ErkJggg.png'></th><th>"+Math.round(herodata[name].spd*(1+shoplv*0.05))+"</th>"
+  let hp = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557284772838375430/fX39f3q4p7GxEW4vnEEvy2EehDkC7AB6W47sCIIOaGhoYABhZIBLDD360PWhy4NCgaoOIMahyI4YOg7AljOI8S22qKJpCAy6NECo.png'></th><th>"+Math.round(herodata[name].hp*(1+shoplv*0.05))+"</th>"
+  let def = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285285419941917/MZEEUTdCd7RAdT5zhgMgWzbdkkWOGGjRVrpVmW3P2MZrc7yn8AfNeSEaG4voUAAAAASUVORK5CYII.png'></th><th>"+Math.round(herodata[name].def*(1+shoplv*0.05))+"</th>"
+  let mdef = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285351824162826/8AAAAAElFTkSuQmCC.png'></th><th>"+Math.round(herodata[name].mdef*(1+shoplv*0.05))+"</th>"
+  $('.modaltable').empty()
+  $('.modal-title').empty()
+  $('.modal-footer').empty()
+  $('.ability').remove()
+  $('.modaltable').append("<tr><td style='border-radius:20px;' rowspan ='4'><img src='"+herodata[name].img+"'></tr>")
+  $('.modaltable').append("<tr>"+atk+hp+"</tr>")
+  $('.modaltable').append("<tr>"+mag+def+"</tr>")
+  $('.modaltable').append("<tr>"+spd+mdef+"</tr>")
+  $('.modal-title').append("<p style='margin:0px;'>Lv."+shoplv+" "+herodata[name].heroname+"</p>")
+  $('.modal-body').append("<span class='ability'>"+herodata[name].ability+"</span>")
+  $('#info').modal();
+  $('.modal-footer').append("<p>在庫数:"+shopdata[id].stock)
+  $('.modal-footer').append("<p>販売終了:"+shopdata[id].end)
+  $('.modal-footer').append("<button onclick='purchase("+id+");'>"+shopdata[id].price+" Aliceで購入</button>")
+  $('.modal-footer').append("<p>所持:"+usercoin[0].alice+" Alice</p>")
+}
+
+function tradeherodetail(name,id){
+  let atk = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285181745266718/iGuuD3Rajbc6oNowJaYZci3DENH6MYu8kayd3LaIWkMzEuz6akESTSRM0AAAAASUVORK5CYII.png'></th><th>"+Math.round(herodata[name].atk*(1+tradedata[id].lv*0.05))+"</th>"
+  let mag = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285236870742038/cXRynhVrd8EF6BNZGAt7cDNwhpkCYDGSygN0nNuG0CLgAVkDNIB769acsACsKqUbsEhDeRTAGvzvhbBzIFjANJybb8s9YGolvyPV.png'></th><th>"+Math.round(herodata[name].mag*(1+tradedata[id].lv*0.05))+"</th>"
+  let spd = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285386171318282/DNRwAAAABJRU5ErkJggg.png'></th><th>"+Math.round(herodata[name].spd*(1+tradedata[id].lv*0.05))+"</th>"
+  let hp = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557284772838375430/fX39f3q4p7GxEW4vnEEvy2EehDkC7AB6W47sCIIOaGhoYABhZIBLDD360PWhy4NCgaoOIMahyI4YOg7AljOI8S22qKJpCAy6NECo.png'></th><th>"+Math.round(herodata[name].hp*(1+tradedata[id].lv*0.05))+"</th>"
+  let def = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285285419941917/MZEEUTdCd7RAdT5zhgMgWzbdkkWOGGjRVrpVmW3P2MZrc7yn8AfNeSEaG4voUAAAAASUVORK5CYII.png'></th><th>"+Math.round(herodata[name].def*(1+tradedata[id].lv*0.05))+"</th>"
+  let mdef = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285351824162826/8AAAAAElFTkSuQmCC.png'></th><th>"+Math.round(herodata[name].mdef*(1+tradedata[id].lv*0.05))+"</th>"
+  $('.modaltable').empty()
+  $('.modal-title').empty()
+  $('.modal-footer').empty()
+  $('.ability').remove()
+  $('.modaltable').append("<tr><td style='border-radius:20px;' rowspan ='4'><img src='"+herodata[name].img+"'></tr>")
+  $('.modaltable').append("<tr>"+atk+hp+"</tr>")
+  $('.modaltable').append("<tr>"+mag+def+"</tr>")
+  $('.modaltable').append("<tr>"+spd+mdef+"</tr>")
+  $('.modal-title').append("<p style='margin:0px;'>Lv."+tradedata[id].lv+" "+herodata[name].heroname+"</p>")
+  $('.modal-body').append("<span class='ability'>"+herodata[name].ability+"</span>")
+  $('#info').modal();
+  $('.modal-footer').append("<button onclick='tradepurchase("+id+","+1+");'>"+tradedata[id].price+" Aliceで購入</button>")
+  $('.modal-footer').append("<p>所持:"+usercoin[0].alice+" Alice</p>")
+}
+
+function tradegeardetail(name,id){
+  let atk = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285181745266718/iGuuD3Rajbc6oNowJaYZci3DENH6MYu8kayd3LaIWkMzEuz6akESTSRM0AAAAASUVORK5CYII.png'></th><th>"+Math.round(geardata[name].atk*(1+tradedata[id].lv*0.05))+"</th>"
+  let mag = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285236870742038/cXRynhVrd8EF6BNZGAt7cDNwhpkCYDGSygN0nNuG0CLgAVkDNIB769acsACsKqUbsEhDeRTAGvzvhbBzIFjANJybb8s9YGolvyPV.png'></th><th>"+Math.round(geardata[name].mag*(1+tradedata[id].lv*0.05))+"</th>"
+  let spd = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285386171318282/DNRwAAAABJRU5ErkJggg.png'></th><th>"+Math.round(geardata[name].spd*(1+tradedata[id].lv*0.05))+"</th>"
+  let hp = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557284772838375430/fX39f3q4p7GxEW4vnEEvy2EehDkC7AB6W47sCIIOaGhoYABhZIBLDD360PWhy4NCgaoOIMahyI4YOg7AljOI8S22qKJpCAy6NECo.png'></th><th>"+Math.round(geardata[name].hp*(1+tradedata[id].lv*0.05))+"</th>"
+  let def = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285285419941917/MZEEUTdCd7RAdT5zhgMgWzbdkkWOGGjRVrpVmW3P2MZrc7yn8AfNeSEaG4voUAAAAASUVORK5CYII.png'></th><th>"+Math.round(geardata[name].def*(1+tradedata[id].lv*0.05))+"</th>"
+  let mdef = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285351824162826/8AAAAAElFTkSuQmCC.png'></th><th>"+Math.round(geardata[name].mdef*(1+tradedata[id].lv*0.05))+"</th>"
+  $('.modaltable').empty()
+  $('.modal-title').empty()
+  $('.modal-footer').empty()
+  $('.ability').remove()
+  $('.modaltable').append("<tr><td style='border-radius:20px;' rowspan ='4'><img src='"+geardata[name].img+"'></tr>")
+  $('.modaltable').append("<tr>"+atk+hp+"</tr>")
+  $('.modaltable').append("<tr>"+mag+def+"</tr>")
+  $('.modaltable').append("<tr>"+spd+mdef+"</tr>")
+  $('.modal-title').append("<p style='margin:0px;'>Lv."+tradedata[id].lv+" "+geardata[name].gearname+"</p>")
+  $('.modal-body').append("<span class='ability'>"+geardata[name].ability+"</span>")
+  $('#info').modal();
+  $('.modal-footer').append("<button onclick='tradepurchase("+id+","+2+");'>"+tradedata[id].price+" Aliceで購入</button>")
+  $('.modal-footer').append("<p>所持:"+usercoin[0].alice+" Alice</p>")
+}
+
+function listherodetail(name,id){
+  let atk = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285181745266718/iGuuD3Rajbc6oNowJaYZci3DENH6MYu8kayd3LaIWkMzEuz6akESTSRM0AAAAASUVORK5CYII.png'></th><th>"+Math.round(herodata[name].atk*(1+userhero[id].lv*0.05))+"</th>"
+  let mag = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285236870742038/cXRynhVrd8EF6BNZGAt7cDNwhpkCYDGSygN0nNuG0CLgAVkDNIB769acsACsKqUbsEhDeRTAGvzvhbBzIFjANJybb8s9YGolvyPV.png'></th><th>"+Math.round(herodata[name].mag*(1+userhero[id].lv*0.05))+"</th>"
+  let spd = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285386171318282/DNRwAAAABJRU5ErkJggg.png'></th><th>"+Math.round(herodata[name].spd*(1+userhero[id].lv*0.05))+"</th>"
+  let hp = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557284772838375430/fX39f3q4p7GxEW4vnEEvy2EehDkC7AB6W47sCIIOaGhoYABhZIBLDD360PWhy4NCgaoOIMahyI4YOg7AljOI8S22qKJpCAy6NECo.png'></th><th>"+Math.round(herodata[name].hp*(1+userhero[id].lv*0.05))+"</th>"
+  let def = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285285419941917/MZEEUTdCd7RAdT5zhgMgWzbdkkWOGGjRVrpVmW3P2MZrc7yn8AfNeSEaG4voUAAAAASUVORK5CYII.png'></th><th>"+Math.round(herodata[name].def*(1+userhero[id].lv*0.05))+"</th>"
+  let mdef = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285351824162826/8AAAAAElFTkSuQmCC.png'></th><th>"+Math.round(herodata[name].mdef*(1+userhero[id].lv*0.05))+"</th>"
+  $('.modaltable').empty()
+  $('.modal-title').empty()
+  $('.modal-footer').empty()
+  $('.ability').remove()
+  $('.modaltable').append("<tr><td style='border-radius:20px;' rowspan ='4'><img src='"+herodata[name].img+"'></tr>")
+  $('.modaltable').append("<tr>"+atk+hp+"</tr>")
+  $('.modaltable').append("<tr>"+mag+def+"</tr>")
+  $('.modaltable').append("<tr>"+spd+mdef+"</tr>")
+  $('.modal-title').append("<p style='margin:0px;'>Lv."+userhero[id].lv+" "+herodata[name].heroname+"</p>")
+  $('.modal-body').append("<span class='ability'>"+herodata[name].ability+"</span>")
+  $('#info').modal();
+  $('.modal-footer').append("<input type='number' style='width:120px;'></td>")
+  $('.modal-footer').append("<button onclick='submit("+id+",1);'>出品する</button>")//1はヒーロー
+}
+
+function listgeardetail(name,id){
+  let atk = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285181745266718/iGuuD3Rajbc6oNowJaYZci3DENH6MYu8kayd3LaIWkMzEuz6akESTSRM0AAAAASUVORK5CYII.png'></th><th>"+Math.round(geardata[name].atk*(1+usergear[id].lv*0.05))+"</th>"
+  let mag = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285236870742038/cXRynhVrd8EF6BNZGAt7cDNwhpkCYDGSygN0nNuG0CLgAVkDNIB769acsACsKqUbsEhDeRTAGvzvhbBzIFjANJybb8s9YGolvyPV.png'></th><th>"+Math.round(geardata[name].mag*(1+usergear[id].lv*0.05))+"</th>"
+  let spd = "<th style='padding-left:10px;'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285386171318282/DNRwAAAABJRU5ErkJggg.png'></th><th>"+Math.round(geardata[name].spd*(1+usergear[id].lv*0.05))+"</th>"
+  let hp = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557284772838375430/fX39f3q4p7GxEW4vnEEvy2EehDkC7AB6W47sCIIOaGhoYABhZIBLDD360PWhy4NCgaoOIMahyI4YOg7AljOI8S22qKJpCAy6NECo.png'></th><th>"+Math.round(geardata[name].hp*(1+usergear[id].lv*0.05))+"</th>"
+  let def = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285285419941917/MZEEUTdCd7RAdT5zhgMgWzbdkkWOGGjRVrpVmW3P2MZrc7yn8AfNeSEaG4voUAAAAASUVORK5CYII.png'></th><th>"+Math.round(geardata[name].def*(1+usergear[id].lv*0.05))+"</th>"
+  let mdef = "<th><img src='https://cdn.discordapp.com/attachments/402211254627991552/557285351824162826/8AAAAAElFTkSuQmCC.png'></th><th>"+Math.round(geardata[name].mdef*(1+usergear[id].lv*0.05))+"</th>"
+  $('.modaltable').empty()
+  $('.modal-title').empty()
+  $('.modal-footer').empty()
+  $('.ability').remove()
+  $('.modaltable').append("<tr><td style='border-radius:20px;' rowspan ='4'><img src='"+geardata[name].img+"'></tr>")
+  $('.modaltable').append("<tr>"+atk+hp+"</tr>")
+  $('.modaltable').append("<tr>"+mag+def+"</tr>")
+  $('.modaltable').append("<tr>"+spd+mdef+"</tr>")
+  $('.modal-title').append("<p style='margin:0px;'>Lv."+usergear[id].lv+" "+geardata[name].gearname+"</p>")
+  $('.modal-body').append("<span class='ability'>"+geardata[name].ability+"</span>")
+  $('#info').modal();
+  $('.modal-footer').append("<input type='number' style='width:120px;'></td>")
+  $('.modal-footer').append("<button onclick='submit("+id+",2);'>出品する</button>")//2は装備
+}
+
+function separate(num){
+  return String(num).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+}
+
+$(function(){
+  $('#shop').css("display", "block")
+  getData('shop')
+  getData('trade/hero')
+  
+  for (let i=0;i<userhero.length;i++){
+    for (let n=0;n<herodata.length;n++){
+      if(herodata[n].heroname === userhero[i].heroname){$('#list .section').append("<div class='partyslot' style='display:inline-block; position:relative;' onclick='listherodetail("+n+","+i+");'><img src='"+herodata[n].img+"'class='partylist'><span class='heroname'>Lv."+userhero[i].lv+"<br>"+userhero[i].heroname+"</span></div>");break;}
+    }
+  }
+  for (let i=0;i<usergear.length;i++){
+    for (let n=0;n<geardata.length;n++){
+      if(geardata[n].gearname === usergear[i].gearname){$('#list .section').append("<div class='partyslot' style='display:inline-block; position:relative;' onclick='listgeardetail("+n+","+i+");'><img src='"+geardata[n].img+"'class='partygearlist'><span class='heroname'>Lv."+usergear[i].lv+"<br>"+usergear[i].gearname+"</span></div>");break;}
+    }
+  }
+  let st = Math.floor(stamina[0].stamina + stamina[0].lasttime/1800)
+  if ( st > 5){st = 5}
+  $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557242934056189963/l0Q2wA6d5uMPCXCCkCfAysZCucVWRdSUuQgD28YYBDxvEYBFyim1xAAAAAElFTkSuQmCC.png'> "+ Math.floor(stamina[0].food + stamina[0].lasttime/60) +"</span>")
+  $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557242879593021474/8Twn5GPgRGbUqyC6AopMgCkGWQgWS4gpBlsML4goMgAmGZ8zsfpAmTNVDEA2ZvogYkRBui249NMdCDCDMEWlUTFwhBPB7iSMDxcc.png'> "+ st +"/5</span>")
+  $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557255728528752671/BFGGliYAAAAAElFTkSuQmCC.png'> "+ separate(usercoin[0].alice) +" Alice</span>")
+  $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557255579672903702/oX8Rf2EQlnY9UAAAAASUVORK5CYII.png'> "+ separate(usercoin[0].bru) +" Bru</span>")
+  $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557255785923608576/fZAAAAAElFTkSuQmCC.png'> "+ separate(usercoin[0].cany) +" Cany</span>")
+  $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557255682706112513/8D1FtjlFrFaReKVehp2Ms5XlpRf8BsA0EINx9364AAAAASUVORK5CYII.png'> "+ separate(usercoin[0].dar) +" Dar</span>")
+})
+</script>
+
+</body>
+</html>

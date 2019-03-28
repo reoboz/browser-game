@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>ダンマス / DnM 「Dungeon and Masters」</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+
+  <body>
+  
+    <div class="container">
+      <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand active" href="/">Dungeon and Masters</a>
+            <ul class="navbar-items"></ul>
+            </div>
+          <ul class="nav navbar-nav le-navbar-table">
+            <li class="active"><a href="/">ホーム</a></li>
+            <li><a href="helo">マップ</a></li>
+            <li><a href="assets">アセット</a></li>
+            <li><a href="trade">トレード</a></li>
+          </ul>
+        </div>
+      </nav>
+          
+      <div class="maincontent">
+      <h1>お知らせ</h1>
+      <h3>Week.4 実装予定の内容</h2>
+      <li>【完了】スタミナシステムの追加</li>
+      <li>【完了】ログイン画面の設定</li>
+      <li>【完了】ワールドマップの最適化</li>
+      <li>【完了】ドロップの設定・アイテムの実装</li>
+      <li>【完了】ダンジョンプロパティの実装(11種類)</li>
+      <li>【完了】情報モーダルの実装</li>
+      <li>【完了】アセット画面を3人チームに最適化</li>
+      <li>【完了】トレードの値段を自由に設定できる機能を追加</li>
+      <li>【完了】新規アカウントの初期化処理</li>
+      <li>【完了】各バイオーム固有の背景を設定</li>
+      <li>【一部完了】バランス調整</li>
+      <br>
+      <li>初心者ダンジョンの追加</li>
+      <li>各レアリティ固有のモンスター配置を設定</li>
+      <br>
+      <li>https化・公開テストの開始</li>
+      <br>
+      <% if (typeof user !== 'undefined') { %>
+      <span class="login-user"><%= user.username %>としてログインしています</span>
+  <% } %>
+      </div>
+    </div>
+    <script type="text/javascript">
+    let stamina = JSON.parse( '<%-stamina%>' );
+    let coin=JSON.parse( '<%-usercoin%>' );
+    $(function(){
+      function separate(num){
+        return String(num).replace( /(\d)(?=(\d\d\d)+(?!\d))/g, '$1,');
+      }
+      let st = Math.floor(stamina[0].stamina + stamina[0].lasttime/1800)
+      if ( st > 5){st = 5}
+      $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557242934056189963/l0Q2wA6d5uMPCXCCkCfAysZCucVWRdSUuQgD28YYBDxvEYBFyim1xAAAAAElFTkSuQmCC.png'> "+ Math.floor(stamina[0].food + stamina[0].lasttime/60) +"</span>")
+      $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557242879593021474/8Twn5GPgRGbUqyC6AopMgCkGWQgWS4gpBlsML4goMgAmGZ8zsfpAmTNVDEA2ZvogYkRBui249NMdCDCDMEWlUTFwhBPB7iSMDxcc.png'> "+ st +"/5</span>")
+      $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557255728528752671/BFGGliYAAAAAElFTkSuQmCC.png'> "+ separate(coin[0].alice) +" Alice</span>")
+      $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557255579672903702/oX8Rf2EQlnY9UAAAAASUVORK5CYII.png'> "+ separate(coin[0].bru) +" Bru</span>")
+      $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557255785923608576/fZAAAAAElFTkSuQmCC.png'> "+ separate(coin[0].cany) +" Cany</span>")
+      $('.navbar-header').append("<span class='navfont'><img src='https://cdn.discordapp.com/attachments/402211254627991552/557255682706112513/8D1FtjlFrFaReKVehp2Ms5XlpRf8BsA0EINx9364AAAAASUVORK5CYII.png'> "+ separate(coin[0].dar) +" Dar</span>")
+    })
+
+    </script>
+  </body>
+</html>

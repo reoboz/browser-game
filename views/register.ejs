@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title><%= title %></title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="format-detection" content="telephone=no">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel='stylesheet' href='/stylesheets/style.css' />
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.0/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-inverse navbar-fixed-top">
+  <div class="container">
+    <div class="navbar-header">
+      <a class="navbar-brand active" href="../">Dungeon and Masters</a>
+      <ul class="navbar-items"></ul>
+    </div>
+    <ul class="nav navbar-nav le-navbar-table">
+      <li><a href="../">ホーム</a></li>
+      <li><a href="helo">マップ</a></li>
+      <li><a href="assets">アセット</a></li>
+      <li><a href="trade">トレード</a></li>
+    </ul>
+  </div>
+</nav>
+<div class="wrapper" style="margin-left:50px;">
+    <h1 class="main-title"><%= title %></h1>
+    <form action="/register" method="post" class="board-form">
+        <span class="label"></span><input type="text" name="user_name" class="input" placeholder="ユーザー名" required><br>
+        <br>
+        <span class="label"></span><input type="email" name="email" class="input" placeholder="Eメール" required><br>
+        <br>
+        <span class="label"></span><input type="password" name="password" class="input" placeholder="パスワード" required><br>
+        <br>
+        <button type="submit" class="submit">新規会員登録</button>
+    </form>
+    <% if (typeof emailExists !== 'undefined') { %>
+        <p class="error"><%= emailExists %></p>
+    <% } %>
+</div>
+</body>
+</html>
