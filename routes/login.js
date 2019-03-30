@@ -4,12 +4,12 @@ var mysql = require('mysql');
 
 //MySQLに接続
 const connection = mysql.createConnection({
-    host : 'localhost',
-    user : 'root',
-    password : 'ktkr1014',
-    database: 'kingoftowers',
-    timezone: 'jst'
-  });
+  host : 'mysql8010.xserver.jp',
+  user : 'dnmdata_reo',
+  password : 'ktkr1014',
+  database: 'dnmdata_gamedata',
+  timezone: 'jst'
+});
 
 router.get('/', function(req, res, next) {
   if (req.session.userid) {
