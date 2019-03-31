@@ -38,9 +38,9 @@ router.post('/', function(req, res, next) {
         connection.query(registerQuery, function(err, rows) {
           connection.query(useridQuery, function(err,userid) {
             var setuserid =userid[0].userid
-            connection.query('insert into userhero (userid, heroname, lv, exp, party, obtainedat) values (?,"Asakaze",1,0,1,now())',[setuserid])
-            connection.query('insert into userhero (userid, heroname, lv, exp, party, obtainedat) values (?,"Kuro",1,0,2,now())',[setuserid])
-            connection.query('insert into userhero (userid, heroname, lv, exp, party, obtainedat) values (?,"Kuro",1,0,3,now())',[setuserid])
+            connection.query('insert into userhero (userid, heroname, lv, exp, party, obtainedat) values (?,"ナギ",1,0,1,now())',[setuserid])
+            connection.query('insert into userhero (userid, heroname, lv, exp, party, obtainedat) values (?,"ミナト",1,0,2,now())',[setuserid])
+            connection.query('insert into userhero (userid, heroname, lv, exp, party, obtainedat) values (?,"ミナト",1,0,3,now())',[setuserid])
             connection.query('insert into usercoin (userid, alice, bru, cany, dar) values(?,0,0,0,0)',[setuserid])
             connection.query('insert into stamina (userid, food, stamina, lastchecked) values(?,2000,5,now())',[setuserid])
             res.redirect('/login');
