@@ -4,10 +4,10 @@ var mysql = require('mysql');
 
 //MySQLに接続
 const connection = mysql.createConnection({
-  host : 'mysql8010.xserver.jp',
-  user : 'dnmdata_reo',
+  host : '59.157.7.30',
+  user : 'root',
   password : 'ktkr1014',
-  database: 'dnmdata_gamedata',
+  database: 'kingoftowers',
   timezone: 'jst'
 });
  
