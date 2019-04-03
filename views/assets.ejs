@@ -127,7 +127,6 @@
       }else{
         $.post('assets/gear',{'name':usergear[id].gearname, 'gearid':usergear[id].gearid,'order':party})
       }
-      location.href='assets'
     }
 
     function geardetail(name,id){
@@ -287,18 +286,17 @@
 
     $(function(){
       $('#party').css("display", "block")
-      for (let i=0;i<userhero.length;i++){
-        for (let n = 0;n< herodata.length;n++){
-          if(herodata[n].heroname === userhero[i].heroname){
-            $('#heroes').append("<div class='partyslot' style='float:left; display:inline-block; position:relative;' onclick='herodetail("+n+","+i+");'><img src='"+herodata[n].img+"'class='partylist'><span class='heroname'>Lv."+userhero[i].lv+"<br>"+userhero[i].heroname+"</span></div>")
-            break;
+      for (let i=0;i<herodata.length;i++){
+        for (let n = 0;n< userhero.length;n++){
+          if(herodata[i].heroname === userhero[n].heroname){
+            $('#heroes').append("<div class='partyslot' style='float:left; display:inline-block; position:relative;' onclick='herodetail("+i+","+n+");'><img src='"+herodata[i].img+"'class='partylist'><span class='heroname'>Lv."+userhero[n].lv+"<br>"+userhero[n].heroname+"</span></div>")
           }
         }
       }
-      for (let i=0;i<usergear.length;i++){
-        for (let n = 0;n< geardata.length;n++){
-          if(geardata[n].gearname === usergear[i].gearname){
-            $('#gears').append("<div class='partyslot' style='float:left; display:inline-block; position:relative;' onclick='geardetail("+n+","+i+");'><img src='"+geardata[n].img+"'class='partygearlist'><span class='heroname'>Lv."+usergear[i].lv+"<br>"+usergear[i].gearname+"</span></div>")}
+      for (let i=0;i<geardata.length;i++){
+        for (let n = 0;n< usergear.length;n++){
+          if(geardata[i].gearname === usergear[n].gearname){
+            $('#gears').append("<div class='partyslot' style='float:left; display:inline-block; position:relative;' onclick='geardetail("+i+","+n+");'><img src='"+geardata[i].img+"'class='partygearlist'><span class='heroname'>Lv."+usergear[n].lv+"<br>"+usergear[n].gearname+"</span></div>")}
       }
       }
       //パーティスロットの設定
@@ -321,11 +319,10 @@
       }
       $('#setparty .modal-body').on('click',function(){
         $('#setpartyslot table').empty()
-        for (let i=0;i<userhero.length;i++){
-          for (let n = 0;n< herodata.length;n++){
-            if(herodata[n].heroname === userhero[i].heroname){
-              $('#setpartyslot table').append("<div class='partyslot' style='display:inline-block; position:relative;' onclick='setpreparty("+n+","+i+","+1+")'><img src='"+herodata[n].img+"'class='partylist'><span class='heroname'>Lv."+userhero[i].lv+"<br>"+userhero[i].heroname+"</span></div>")
-              break;
+        for (let i=0;i<herodata.length;i++){
+          for (let n = 0;n< userhero.length;n++){
+            if(herodata[i].heroname === userhero[n].heroname){
+              $('#setpartyslot table').append("<div class='partyslot' style='display:inline-block; position:relative;' onclick='setpreparty("+i+","+n+","+1+")'><img src='"+herodata[i].img+"'class='partylist'><span class='heroname'>Lv."+userhero[n].lv+"<br>"+userhero[n].heroname+"</span></div>")
             }
           }
         } 
@@ -333,11 +330,10 @@
       })
       $('#setparty .modal-footer').on('click',function(){
         $('#setpartyslot table').empty()
-        for (let i=0;i<usergear.length;i++){
-          for (let n = 0;n< geardata.length;n++){
-            if(geardata[n].gearname === usergear[i].gearname){
-              $('#setpartyslot table').append("<div class='partyslot' style='display:inline-block; position:relative;' onclick='setpreparty("+n+","+i+","+2+")'><img src='"+geardata[n].img+"'class='partygearlist'><span class='heroname'>Lv."+usergear[i].lv+"<br>"+usergear[i].gearname+"</span></div>")
-              break;
+        for (let i=0;i<geardata.length;i++){
+          for (let n = 0;n< usergear.length;n++){
+            if(geardata[i].gearname === usergear[n].gearname){
+              $('#setpartyslot table').append("<div class='partyslot' style='display:inline-block; position:relative;' onclick='setpreparty("+i+","+n+","+2+")'><img src='"+geardata[i].img+"'class='partygearlist'><span class='heroname'>Lv."+usergear[n].lv+"<br>"+usergear[n].gearname+"</span></div>")
             }
           }
         } 

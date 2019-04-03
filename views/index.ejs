@@ -29,7 +29,29 @@
           
       <div class="maincontent">
       <h1>お知らせ</h1>
-      <h3>Week.4 実装予定の内容</h2>
+      <h3>How to Play<h3>
+      <span>You can edit your party via "アセット" tab.</span><br>
+      <span>To obtain new units visit "トレード" tab.</span><br>
+      <span>"トレード > ショップ" tab is where you can buy stuff from gamemaster.</span><br>
+      <span>"トレード > 取引所" is where you can buy stuff from other players.</span><br>
+      <span>"トレード > 出品" shows your assets and by selecting an asset you can list your item with the price you specified.</span><br>
+      <span>"マップ" tab is where you go for quests with the party you edited.</span><br>
+      <span>Pink tile in the center is for newbie level(Lv5-15). </span><br>
+      <span>Other colors are glay(Lv15-25), green(Lv30-40), blue(Lv45-55), purple(Lv60-70), and orange(Lv75-85).</span><br>
+      <span>Monsters in glay maps may drop currency, if the map belongs to Red flag it drops "Alice", if it is Blue "Bru", Yellow for "Cany", and Green for "Dar".</span><br>
+      <span>In other maps you might find gears. "Sword" series is commonly found in "Aliceland", "Stuff" series is in "Brumel", "Bible" series is in "Canyon", "Armour" series is in "Darberg".</span><br>
+      <span>Higher gears are exclusively found in its nation. </span>
+
+      <h3>Week.5 実装予定の内容</h3>
+      <li>各レアリティ固有のモンスター配置を設定</li>
+      <li>更新や戻るで同じマップに挑めなくする(htaccess)(getの直リンクの禁止)</li>
+      <li>データ書き換え時にログ出力</li>
+      <li>BCD通貨の意味を持たせる</li>
+      <li>出品取り下げ機能の追加</li>
+      <li>通知を作る</li>
+      <li>https化</li>
+      <br>
+      <h3>Week.4 実装予定の内容</h3>
       <li>【完了】スタミナシステムの追加</li>
       <li>【完了】ログイン画面の設定</li>
       <li>【完了】ワールドマップの最適化</li>
@@ -40,12 +62,14 @@
       <li>【完了】トレードの値段を自由に設定できる機能を追加</li>
       <li>【完了】新規アカウントの初期化処理</li>
       <li>【完了】各バイオーム固有の背景を設定</li>
+      <li>【完了】戦闘画面でのダメージディスプレイ</li>
+      <li>【完了】初心者ダンジョンの追加</li>
+      <li>【完了】特殊アビリティの作成</li>
+      <li>【完了】ぶつり・まほう・しえんキャラクターの作成</li>
+      <li>【完了】公開テストの開始</li>
+      <br>
       <li>【一部完了】バランス調整</li>
       <br>
-      <li>初心者ダンジョンの追加</li>
-      <li>各レアリティ固有のモンスター配置を設定</li>
-      <br>
-      <li>https化・公開テストの開始</li>
       <br>
       <% if (typeof user !== 'undefined') { %>
       <span class="login-user"><%= user.username %>としてログインしています</span>

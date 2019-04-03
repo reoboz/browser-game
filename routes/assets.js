@@ -17,9 +17,9 @@ router.get('/', function(req, res, next) {
   var userId = req.session.userid
   if(userId){
     connection.query('SELECT * from userhero where userid = ?;',[userId], function (err, resa) {
-      connection.query('SELECT * from hero_data', function (err, resa2) {
+      connection.query('SELECT * from hero_data order by rarity desc', function (err, resa2) {
         connection.query('SELECT * from usergear where userid = ?;',[userId],function(err,resa3){
-          connection.query('SELECT * from geardata',function(err,resa4){
+          connection.query('SELECT * from geardata order by rarity desc',function(err,resa4){
             connection.query('SELECT * from usercoin where userid = ?',[userId],function(err,resa5){
               connection.query('SELECT food, stamina, unix_timestamp(now()) - unix_timestamp(lastchecked) as lasttime from stamina where userid = ?;',[userId], function (err, resa6) {
                 res.render('assets', {
